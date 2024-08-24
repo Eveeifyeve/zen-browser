@@ -4,19 +4,17 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
-  outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit self; } {
+  outputs = inputs@{ nixpkgs, flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
       systems = nixpkgs.lib.systems.flakeExposed;
 
       perSystem = { pkgs, system, ... }: {
+        # `nix build` to build the package
+        packages.default = pkgs.callPackage ./package/default.nix { };
+
+        # Simple Dev shell with packages needed to update the package.
         devShells.default = pkgs.mkShell {
-          packages = [
-            pkgs.callPackage ./nix/package.nix { }
-          ];
-        };
-        packages = {
-          default = pkgs.callPackage ./nix/package.nix { };
-          firefox = pkgs.firefox;
+          packages = [ pkgs.nodePackages.patch-package ];
         };
     };
   };

@@ -1,30 +1,35 @@
-{
-  stdenv, lib, callPackage, buildMozillaMach, nixosTests,
-}:
+{ lib, stdenv, fetchFromGithub, fetchurl, buildNpmPackage, callPackage, nixosTests }:
 let
-  srcJson = lib.importJSON ./src.json;
-  src = {
-    source = fetchFromGitHub {
-      owner = "ZenBrowser";
-      repo = "ZenBrowser";
-      fetchSubmodules = true;
-      inherit (srcJson.zenbrowser) rev sha256;
-    };
-    firefox = fetchUrl {
-      url = "mirror://mozilla/firefox/releases/${srcJson.firefox.version}/source/firefox-${srcJson.firefox.version}.source.tar.xz";
-      inherit (srcJson.firefox) rev sha256;
-    };
+  firefoxVersion = "129.0.2";
+  firefoxSrc = fetchurl {
+    url = "mirror://mozilla/releases/firefox/${firefoxVersion}/source/firefox-${firefoxVersion}.source.tar.xz";
+    hash = lib.fakeSha256;
   };
-in 
-(buildMozillaMach rec {
+in
+buildNpmPackage rec {
   pname = "zen-browser";
+  version = "0.0.1";
 
-  meta = with lib; {
-    description = "A browser based on Firefox and Chromium";
-    homepage = "https://github.com/ZenBrowser/ZenBrowser";
-    maintainers = with maintainers; [ ]; # TODO: add maintainers
-    license = licenses.mpl20;
-    platforms = platforms.all;
-    broken = platforms.linux; # Testing needs to be done on Linux
+  # Src of zen-browser
+  src = fetchFromGithub {
+    owner = "zen-browser";
+    repo = "desktop";
+    rev = version;
+    hash = lib.fakeSha256;
+    fetchSubmodules = true;
   };
-})
+
+  preBuild = ''
+    # Patch Surfer to use Nix version of Firefox
+    patch node_modules/@zen-browser/surfer/dist/utils/version.js < ${./default.nix}
+    patch node_modules/@zen-browser/surfer/dist/commands/download/firefox.js < ${./default.nix}
+
+    mkdir -p surfer/engine
+
+    cp -r ${firefoxSrc} surfer/engine/firefox-${firefoxVersion}.source.tar.xz
+
+    npm run init
+  '';
+
+  updateScript = callPackage ./update.nix { inherit pname; };
+}

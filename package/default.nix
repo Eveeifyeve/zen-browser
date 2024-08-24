@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGithub, fetchurl, buildNpmPackage, callPackage, nixosTests }:
+{ lib, stdenv, fetchFromGitHub, fetchurl, buildNpmPackage, callPackage, nixosTests }:
 let
   firefoxVersion = "129.0.2";
   firefoxSrc = fetchurl {
@@ -11,7 +11,7 @@ buildNpmPackage rec {
   version = "0.0.1";
 
   # Src of zen-browser
-  src = fetchFromGithub {
+  src = fetchFromGitHub {
     owner = "zen-browser";
     repo = "desktop";
     rev = version;

@@ -10,7 +10,7 @@
 
       perSystem = { pkgs, system, ... }: {
         # `nix build` to build the package
-        packages.default = pkgs.callPackage ./package/default.nix { };
+        packages.default = pkgs.callPackage ./default.nix { };
 
         # Simple Dev shell with packages needed to update the package.
         devShells.default = pkgs.mkShell {

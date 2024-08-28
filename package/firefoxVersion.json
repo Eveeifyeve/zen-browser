@@ -1,0 +1,9 @@
+{
+    "stable": "109.0.1",
+    "devEdition": "130.0b8",
+    "esr": {
+        "latest": "115.14.0esr",
+        "next": "128.1.0esr"
+    },
+    "next": "131.0a1"
+}

@@ -1,35 +1,42 @@
-{ lib, stdenv, fetchFromGithub, fetchurl, buildNpmPackage, callPackage, nixosTests }:
-let
-  firefoxVersion = "129.0.2";
-  firefoxSrc = fetchurl {
-    url = "mirror://mozilla/releases/firefox/${firefoxVersion}/source/firefox-${firefoxVersion}.source.tar.xz";
+{lib, stdenv, pnpm, nodejs, fetchurl, fetchFromGitHub}:
+let 
+  firefoxVersions = lib.importJSON ./firefoxVersion.json;
+  firefox-version = firefoxVersions.stable;
+  firefox-src = fetchurl {
+    url = "mirror://mozilla/releases/firefox-${firefox-version}/source/firefox-${firefox-version}.source.tar.xz";
     hash = lib.fakeSha256;
   };
-in
-buildNpmPackage rec {
+in 
+stdenv.mkDerivation rec { 
   pname = "zen-browser";
   version = "0.0.1";
 
-  # Src of zen-browser
-  src = fetchFromGithub {
+  nativeBuildInputs = [
+    pnpm
+    nodejs
+  ];
+
+  src = fetchFromGitHub {
     owner = "zen-browser";
-    repo = "desktop";
-    rev = version;
+    repo = "zen-browser";
+    rev = "v${version}";
     hash = lib.fakeSha256;
     fetchSubmodules = true;
   };
 
+  pnpmDeps = pnpm.fetchDeps {
+    pname = "${pname}-pnpm-deps";
+    inherit src version;
+    hash = lib.fakeSha256;
+  };
+
+
+  # Provides Firefox source required to build
   preBuild = ''
-    # Patch Surfer to use Nix version of Firefox
-    patch node_modules/@zen-browser/surfer/dist/utils/version.js < ${./default.nix}
-    patch node_modules/@zen-browser/surfer/dist/commands/download/firefox.js < ${./default.nix}
-
-    mkdir -p surfer/engine
-
-    cp -r ${firefoxSrc} surfer/engine/firefox-${firefoxVersion}.source.tar.xz
-
-    npm run init
+    mkdir -p .surfer/engine
+    cp -r ${firefox-src} .surfer/engine/firefox-${firefox-version}.source.tar.xz
+    pnpm run bootstrap && pnpm run import
   '';
 
-  updateScript = callPackage ./update.nix { inherit pname; };
+  
 }

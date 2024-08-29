@@ -41,7 +41,8 @@ stdenv.mkDerivation rec {
     #TODO: Lanaguage Pack support
     # Build language Packs
 
-    # Build Zen Browser
+    # Build Zen Browser TODO: Issue #2
+    exit 1
     pnpm build
   '';
 

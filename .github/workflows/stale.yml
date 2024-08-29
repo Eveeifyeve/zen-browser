@@ -3,6 +3,7 @@ name: Stale Bot
 on:
   schedule:
   - cron: "21 4 * * *"
+  workflow_dispatch:
 permissions:
     contents: write
     issues: write

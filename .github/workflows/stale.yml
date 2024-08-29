@@ -1,0 +1,24 @@
+name: Stale Bot
+
+on:
+  schedule:
+  - cron: "21 4 * * *"
+permissions:
+    contents: write
+    issues: write
+    pull-requests: write
+jobs:
+  stale:
+    permissions:
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v8
+      with:
+        days-before-stale: 180
+        days-before-close: -1 # never close
+        exempt-draft-pr: true
+        exempt-issue-labels: 'never-stable'
+        exempt-pr-labels: 'never-stable'
+        remove-stale-when-updated: true

@@ -1,0 +1,42 @@
+name: 🐛 Bug Report
+description: Report an issue that should be fixed
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for submitting a bug report. It helps makes the package better.
+  
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+  
+  - type: textarea
+    attributes:
+      label: Screnshots
+      description: If applicable, add screenshots to help explain your problem.
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.
+
+  - type: input
+    attributes:
+      label: Metadata
+      description: Please run `nix-shell -p nix-info --run "nix-info -m"` and paste the result.
+      value: |
+        ```
+        <PASTE METADATA HERE>
+        ```
+  - type: markdown
+    attributes:
+      value: |
+        Just Note issues make take a while to receive a response so please be patient!
